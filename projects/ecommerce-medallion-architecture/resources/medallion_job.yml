@@ -1,0 +1,32 @@
+# Databricks Asset Bundle job resource.
+# Verify that notebook paths match the deployed project layout.
+
+resources:
+  jobs:
+    medallion_architecture:
+      name: Medallion_Architecture
+
+      tasks:
+        - task_key: Dimension_Bronze
+          notebook_task:
+            notebook_path: ../src/01_bronze_layer
+            source: WORKSPACE
+
+        - task_key: Dimension_Silver
+          depends_on:
+            - task_key: Dimension_Bronze
+          notebook_task:
+            notebook_path: ../src/02_silver_layer
+            source: WORKSPACE
+
+        - task_key: Dimension_Gold
+          depends_on:
+            - task_key: Dimension_Silver
+          notebook_task:
+            notebook_path: ../src/03_gold_layer
+            source: WORKSPACE
+
+      queue:
+        enabled: true
+
+      performance_target: PERFORMANCE_OPTIMIZED
