@@ -1,0 +1,36 @@
+# Sample Databricks Asset Bundle job resource.
+# Adjust notebook paths to match your deployed bundle layout.
+
+resources:
+  jobs:
+    fmcg_incremental_update:
+      name: fmcg_incremental_update
+      tasks:
+        - task_key: customers_dataset
+          notebook_task:
+            notebook_path: ../src/02_customers_pipeline
+            source: WORKSPACE
+
+        - task_key: products_dataset
+          depends_on:
+            - task_key: customers_dataset
+          notebook_task:
+            notebook_path: ../src/01_products_pipeline
+            source: WORKSPACE
+
+        - task_key: pricing_dataset
+          depends_on:
+            - task_key: products_dataset
+          notebook_task:
+            notebook_path: ../src/03_gross_price_pipeline
+            source: WORKSPACE
+
+        - task_key: fact_dimension_dataset
+          depends_on:
+            - task_key: pricing_dataset
+          notebook_task:
+            notebook_path: ../src/05_fact_orders_incremental
+            source: WORKSPACE
+
+      queue:
+        enabled: true
